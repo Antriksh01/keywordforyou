@@ -8,16 +8,33 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { FaTools, FaHashtag, FaTags } from "react-icons/fa";
+import {
+  FaTools,
+  FaHashtag,
+  FaTags,
+  FaBriefcase,
+  FaComment,
+} from "react-icons/fa";
 import { useState } from "react";
-import { TbListDetails, TbFileDescription } from "react-icons/tb";
+import {
+  TbListDetails,
+  TbFileDescription,
+  TbSettingsSearch,
+} from "react-icons/tb";
 import { ImEmbed2 } from "react-icons/im";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { GrChannel } from "react-icons/gr";
+import { GiExtractionOrb, GiKnightBanner } from "react-icons/gi";
+import { AiOutlineAudit } from "react-icons/ai";
+import { FaMoneyBillTrendUp } from "react-icons/fa6";
+import { IoLogoYoutube } from "react-icons/io";
+import { LuGalleryThumbnails } from "react-icons/lu";
+import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 
 const navigation = [
-  { name: "Home", href: "#", current: true },
-  { name: "Pricing", href: "#", current: false },
-  { name: "Blog", href: "#", current: false },
+  { name: "Home", href: "/" },
+  { name: "Pricing", href: "/pricing" },
+  { name: "Blog", href: "/blogs" },
 ];
 
 const ProductItem = ({ title, description, href, src }) => {
@@ -47,6 +64,7 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
+  const location = useLocation();
   const [active, setActive] = useState(null);
   const [loggedUser, setLoggedUser] = useState(false);
   return (
@@ -77,21 +95,20 @@ export default function Navbar() {
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">
-              <div className="flex space-x-4">
+              <div className="flex space-x-6">
                 {navigation.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    aria-current={item.current ? "page" : undefined}
+                  <Link
+                    key={item.href}
+                    to={item.href}
                     className={classNames(
-                      item.current
+                      item.href === location.pathname
                         ? "text-black border-b-2 border-red-600"
                         : "text-black-300 hover:text-red-500",
                       "rounded-md px-3 py-2 text-sm font-medium"
                     )}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -102,7 +119,7 @@ export default function Navbar() {
               <MenuButton className="relative flex bg-transparent hover:text-red-500">
                 <span className="absolute" />
                 <span className="sr-only">Open user menu</span>
-                <h4 className="font-bold p-1 ">Tools</h4>
+                <h4 className="font-bold p-1">Tools</h4>
                 <FaTools className="mt-2" />
               </MenuButton>
             </div>
@@ -114,40 +131,63 @@ export default function Navbar() {
                 <div className="flex-shrink-0 rounded-md shadow-2xl p-5">
                   <h2 className="text-xl font-bold mb-1">YT Generator Tools</h2>
                   <ul>
-                    <li className="flex items-center">
-                      <TbFileDescription className="text-xl font-bold mr-1" />
-                      <h5 className="">
-                        YouTube Title & Description Generator
-                      </h5>
-                    </li>
-                    <li className="flex items-center">
-                      <FaHashtag className="text-lg font-bold mr-1" />
-                      <h5>YouTube Hashtag Generator</h5>
-                    </li>
-                    <li className="flex items-center">
-                      <FaTags className="text-lg font-bold mr-1" />
-                      <h5>YouTube Tag Generator</h5>
-                    </li>
-                    <li className="flex items-center">
-                      <ImEmbed2 className="text-lg font-bold mr-1" />
-                      <h5>YouTube Embed Code Generator</h5>
-                    </li>
+                    <Link to="/youtube-title-description-generator">
+                      <li className="flex items-center">
+                        <TbFileDescription className="text-xl font-bold mr-1 hover:text-red-400" />
+                        <h5 className="hover:text-red-400">
+                          YouTube Title & Description Generator
+                        </h5>
+                      </li>
+                    </Link>
+                    <Link to="/youtube-hashtag-generator">
+                      <li className="flex items-center">
+                        <FaHashtag className="text-lg font-bold mr-1 hover:text-red-400" />
+                        <h5 className="hover:text-red-400">
+                          YouTube Hashtag Generator
+                        </h5>
+                      </li>
+                    </Link>
+                    <Link to="/youtube-tag-generator">
+                      <li className="flex items-center">
+                        <FaTags className="text-lg font-bold mr-1" />
+                        <h5 className="hover:text-red-400">
+                          YouTube Tag Generator
+                        </h5>
+                      </li>
+                    </Link>
+                    <Link to="/youtube-embed-code-generator">
+                      <li className="flex items-center">
+                        <ImEmbed2 className="text-lg font-bold mr-1" />
+                        <h5 className="hover:text-red-400">
+                          YouTube Embed Code Generator
+                        </h5>
+                      </li>
+                    </Link>
                   </ul>
                 </div>
                 <div className="flex-shrink-0 rounded-md shadow-2xl p-5">
                   <h2 className="text-xl font-bold mb-1">YT Extractor Tools</h2>
                   <ul>
+                    <Link to="/youtube-channel-id-finder">
+                      <li className="flex items-center">
+                        <GrChannel className="text-lg font-bold mr-1" />
+                        <h5 className="hover:text-red-400">
+                          YouTube Channel ID Finder
+                        </h5>
+                      </li>
+                    </Link>
+
                     <li className="flex items-center">
-                      <TbFileDescription className="text-lg font-bold mr-1" />
-                      <h5>YouTube Channel ID Finder</h5>
+                      <GiExtractionOrb className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Tag Extractor
+                      </h5>
                     </li>
                     <li className="flex items-center">
-                      <FaHashtag className="text-lg font-bold mr-1" />
-                      <h5>YouTube Tag Extractor</h5>
-                    </li>
-                    <li className="flex items-center">
-                      <FaTags className="text-lg font-bold mr-1" />
-                      <h5>YouTube Title & Description Extractor</h5>
+                      <GiExtractionOrb className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Title & Description Extractor
+                      </h5>
                     </li>
                   </ul>
                 </div>
@@ -157,20 +197,28 @@ export default function Navbar() {
                   </h2>
                   <ul>
                     <li className="flex items-center">
-                      <TbFileDescription className="text-lg font-bold mr-1" />
-                      <h5>YouTube Channel Audit</h5>
+                      <AiOutlineAudit className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Channel Audit
+                      </h5>
                     </li>
                     <li className="flex items-center">
-                      <FaHashtag className="text-lg font-bold mr-1" />
-                      <h5>YouTube Video Audit</h5>
+                      <AiOutlineAudit className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Video Audit
+                      </h5>
                     </li>
                     <li className="flex items-center">
-                      <FaTags className="text-lg font-bold mr-1" />
-                      <h5>YouTube Trending Videos</h5>
+                      <FaMoneyBillTrendUp className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Trending Videos
+                      </h5>
                     </li>
                     <li className="flex items-center">
-                      <ImEmbed2 className="text-lg font-bold mr-1" />
-                      <h5>YouTube Channel Search Tool</h5>
+                      <TbSettingsSearch className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Channel Search Tool
+                      </h5>
                     </li>
                   </ul>
                 </div>
@@ -180,16 +228,22 @@ export default function Navbar() {
                   </h2>
                   <ul>
                     <li className="flex items-center">
-                      <TbFileDescription className="text-lg font-bold mr-1" />
-                      <h5>YouTube Channel Banner Downloader</h5>
+                      <GiKnightBanner className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Channel Banner Downloader
+                      </h5>
                     </li>
                     <li className="flex items-center">
-                      <FaHashtag className="text-lg font-bold mr-1" />
-                      <h5>YouTube Channel Logo Downloader</h5>
+                      <IoLogoYoutube className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Channel Logo Downloader
+                      </h5>
                     </li>
                     <li className="flex items-center">
-                      <FaTags className="text-lg font-bold mr-1" />
-                      <h5>YouTube Thumbnails Downloader</h5>
+                      <LuGalleryThumbnails className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Thumbnails Downloader
+                      </h5>
                     </li>
                   </ul>
                 </div>
@@ -197,16 +251,20 @@ export default function Navbar() {
                   <h2 className="text-xl font-bold mb-1">Other Tools</h2>
                   <ul>
                     <li className="flex items-center">
-                      <TbFileDescription className="text-lg font-bold mr-1" />
-                      <h5>YouTube Money Calculator</h5>
+                      <RiMoneyRupeeCircleFill className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Money Calculator
+                      </h5>
                     </li>
                     <li className="flex items-center">
-                      <FaHashtag className="text-lg font-bold mr-1" />
-                      <h5>Case Convertor</h5>
+                      <FaBriefcase className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">Case Convertor</h5>
                     </li>
                     <li className="flex items-center">
-                      <FaTags className="text-lg font-bold mr-1" />
-                      <h5>YouTube Comment Picker</h5>
+                      <FaComment className="text-lg font-bold mr-1" />
+                      <h5 className="hover:text-red-400">
+                        YouTube Comment Picker
+                      </h5>
                     </li>
                   </ul>
                 </div>
@@ -231,7 +289,7 @@ export default function Navbar() {
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                 >
-                  Your Profile
+                  About Us
                 </a>
               </MenuItem>
               <MenuItem>
@@ -239,7 +297,7 @@ export default function Navbar() {
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                 >
-                  Settings
+                  Contact Us
                 </a>
               </MenuItem>
               <MenuItem>
@@ -247,7 +305,15 @@ export default function Navbar() {
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                 >
-                  Sign out
+                  Advertise With Us
+                </a>
+              </MenuItem>
+              <MenuItem>
+                <a
+                  href="#"
+                  className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
+                >
+                  Write For Us
                 </a>
               </MenuItem>
             </MenuItems>
@@ -313,18 +379,22 @@ export default function Navbar() {
             <>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex space-x-4">
-                  <button
-                    className="text-white bg-red-600 hover:bg-red-900 hover:text-white
+                  <Link to="/login">
+                    <button
+                      className="text-white bg-red-600 hover:bg-red-900 hover:text-white
                       rounded-md px-3 py-2 text-sm font-medium"
-                  >
-                    Login
-                  </button>
-                  <button
-                    className="text-white bg-red-600 hover:bg-red-900 hover:text-white
+                    >
+                      Login
+                    </button>
+                  </Link>
+                  <Link to="/signup">
+                    <button
+                      className="text-white bg-red-600 hover:bg-red-900 hover:text-white
                       rounded-md px-3 py-2 text-sm font-medium"
-                  >
-                    Signup
-                  </button>
+                    >
+                      Signup
+                    </button>
+                  </Link>
                 </div>
               </div>
             </>
