@@ -25,6 +25,7 @@ import Contactus from "./pages/OtherData/Contactus";
 import AdvertiseWithUs from "./pages/OtherData/AdvertiseWithUs";
 import WriteForUs from "./pages/OtherData/WriteForUs";
 import Home from "./pages/Home";
+import Footer from "./component/Footer";
 
 const App = () => {
   return (
@@ -82,6 +83,7 @@ const App = () => {
         <Route path="/advertise-with-us" element={<AdvertiseWithUs />} />
         <Route path="/write-for-us" element={<WriteForUs />} />
       </Routes>
+      <Footer />
     </>
   );
 };
