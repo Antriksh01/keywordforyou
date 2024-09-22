@@ -53,17 +53,35 @@ const Faq = () => {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {faqData.map((item, index) => (
-          <div key={index} className="border rounded-lg shadow-sm">
+          <div
+            key={index}
+            className={`border rounded-lg shadow-sm transition-all duration-700 ${
+              openIndex === index ? "bg-indigo-100" : "bg-white"
+            }`}
+          >
             <button
               onClick={() => toggleFAQ(index)}
-              className="w-full p-4 text-left flex justify-between items-center"
+              className="w-full p-4 text-left flex justify-between items-center transition-colors duration-500 hover:bg-indigo-200"
             >
               <span className="font-medium">{item.question}</span>
-              <span>{openIndex === index ? "-" : "+"}</span>
+              <span
+                className={`transition-transform duration-500 ${
+                  openIndex === index ? "rotate-180" : "rotate-0"
+                }`}
+              >
+                {openIndex === index ? "-" : "+"}
+              </span>
             </button>
-            {openIndex === index && (
+            <div
+              className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.4, 0, 0.2, 1)] ${
+                openIndex === index
+                  ? "max-h-80 opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
+              style={{ maxHeight: openIndex === index ? "500px" : "0px" }}
+            >
               <div className="p-4 border-t text-gray-600">{item.answer}</div>
-            )}
+            </div>
           </div>
         ))}
       </div>

@@ -412,14 +412,14 @@ export default function Navbar() {
                   Contact Us
                 </Link>
               </MenuItem>
-              <MenuItem>
+              {/* <MenuItem>
                 <Link
                   to="/advertise-with-us"
                   className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                 >
                   Advertise With Us
                 </Link>
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem>
                 <Link
                   to="/write-for-us"
