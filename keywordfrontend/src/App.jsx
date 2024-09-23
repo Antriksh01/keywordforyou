@@ -26,6 +26,7 @@ import AdvertiseWithUs from "./pages/OtherData/AdvertiseWithUs";
 import WriteForUs from "./pages/OtherData/WriteForUs";
 import Home from "./pages/Home";
 import Footer from "./component/Footer";
+import EmbedCodeGen from "./pages/YoutubeTools/EmbedCodeGen";
 
 const App = () => {
   return (
@@ -45,7 +46,7 @@ const App = () => {
         <Route path="/youtube-tag-generator" element={<TagGen />} />
         <Route
           path="/youtube-embed-code-generator"
-          element={<TitleDescriptionGen />}
+          element={<EmbedCodeGen />}
         />
         <Route
           path="/youtube-channel-id-finder"
