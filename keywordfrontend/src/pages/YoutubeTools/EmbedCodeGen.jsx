@@ -8,6 +8,7 @@ import {
   FaLinkedinIn,
 } from "react-icons/fa";
 import { FiAlignCenter } from "react-icons/fi";
+import EmbedCodeText from "../../component/EmbedCodeText";
 
 const EmbedCodeGen = () => {
   const [showMore, setShowMore] = useState(false);
@@ -23,7 +24,7 @@ const EmbedCodeGen = () => {
       <h2 className="text-4xl mt-12 font-bold text-center text-cyan-800">
         YouTube Embed Code Generator
       </h2>
-      <div className="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
+      <div className="w-full max-w-4xl mb-8 mx-auto bg-white shadow-lg shadow-red-500/50 rounded-lg p-8 ">
         <div className="mb-4">
           <input
             type="text"
@@ -204,9 +205,9 @@ const EmbedCodeGen = () => {
               Progress Bar Color:
             </label>
             <select className="w-full mt-1 p-2 text-sm border border-gray-300 rounded-md">
-              <option>Red</option>
-              <option>blue</option>
-              <option>green</option>
+              <option className="bg-red-400 text-white">Red</option>
+              <option className="bg-blue-300 text-white">blue</option>
+              <option className="bg-green-400 text-white">green</option>
             </select>
           </div>
         </div>
@@ -220,7 +221,7 @@ const EmbedCodeGen = () => {
               <div
                 onClick={toggleSwitch}
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                  isToggled ? "bg-green-400" : "bg-gray-300"
+                  isToggled ? "bg-green-400" : "bg-red-600"
                 }`}
               >
                 <div
@@ -237,7 +238,7 @@ const EmbedCodeGen = () => {
               <div
                 onClick={toggleSwitch}
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                  isToggled ? "bg-green-400" : "bg-gray-300"
+                  isToggled ? "bg-green-400" : "bg-red-600"
                 }`}
               >
                 <div
@@ -254,7 +255,7 @@ const EmbedCodeGen = () => {
               <div
                 onClick={toggleSwitch}
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                  isToggled ? "bg-green-400" : "bg-gray-300"
+                  isToggled ? "bg-green-400" : "bg-red-600"
                 }`}
               >
                 <div
@@ -271,7 +272,7 @@ const EmbedCodeGen = () => {
               <div
                 onClick={toggleSwitch}
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                  isToggled ? "bg-green-400" : "bg-gray-300"
+                  isToggled ? "bg-green-400" : "bg-red-600"
                 }`}
               >
                 <div
@@ -288,7 +289,7 @@ const EmbedCodeGen = () => {
               <div
                 onClick={toggleSwitch}
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                  isToggled ? "bg-green-400" : "bg-gray-300"
+                  isToggled ? "bg-green-400" : "bg-red-600"
                 }`}
               >
                 <div
@@ -305,7 +306,7 @@ const EmbedCodeGen = () => {
               <div
                 onClick={toggleSwitch}
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                  isToggled ? "bg-green-400" : "bg-gray-300"
+                  isToggled ? "bg-green-400" : "bg-red-600"
                 }`}
               >
                 <div
@@ -322,7 +323,7 @@ const EmbedCodeGen = () => {
               <div
                 onClick={toggleSwitch}
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                  isToggled ? "bg-green-400" : "bg-gray-300"
+                  isToggled ? "bg-green-400" : "bg-red-600"
                 }`}
               >
                 <div
@@ -339,7 +340,7 @@ const EmbedCodeGen = () => {
               <div
                 onClick={toggleSwitch}
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                  isToggled ? "bg-green-400" : "bg-gray-300"
+                  isToggled ? "bg-green-400" : "bg-red-600"
                 }`}
               >
                 <div
@@ -374,6 +375,7 @@ const EmbedCodeGen = () => {
           <FaLinkedinIn />
         </div>
       </div>
+      <EmbedCodeText />
     </>
   );
 };
