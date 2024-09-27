@@ -27,6 +27,7 @@ import WriteForUs from "./pages/OtherData/WriteForUs";
 import Home from "./pages/Home";
 import Footer from "./component/Footer";
 import EmbedCodeGen from "./pages/YoutubeTools/EmbedCodeGen";
+import ChannelSearchTool from "./pages/YoutubeTools/ChannelSearchTool";
 
 const App = () => {
   return (
@@ -62,7 +63,7 @@ const App = () => {
         <Route path="/youtube-trending-videos" element={<TrendingVideos />} />
         <Route
           path="/youtube-channel-search-tool"
-          element={<TitleDescriptionExtract />}
+          element={<ChannelSearchTool />}
         />
         <Route
           path="/youtube-channel-banner-downloader"
