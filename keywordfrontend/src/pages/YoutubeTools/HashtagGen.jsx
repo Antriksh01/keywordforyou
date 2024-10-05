@@ -1,7 +1,95 @@
+import axios from "axios";
+import { useState } from "react";
 import { BsTwitterX } from "react-icons/bs";
 import { FaFacebook, FaLinkedinIn } from "react-icons/fa";
 
 const HashtagGen = () => {
+  const [tags, setTags] = useState([]); // Store tags
+  const [inputValue, setInputValue] = useState(""); // Store current input
+  const [result, setResult] = useState();
+  const [showResult, setShowResult] = useState(false);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && inputValue.trim() !== "") {
+      e.preventDefault(); // Prevent form submission or newline behavior
+      setTags([...tags, inputValue.trim()]); // Add the tag
+      setInputValue(""); // Clear the input after adding tag
+    } else if (e.key === "Backspace" && inputValue === "") {
+      // Remove the last tag when backspace is pressed on empty input
+      setTags(tags.slice(0, -1)); // Remove the last tag
+    }
+  };
+
+  // Handle removing a specific tag
+  const removeTag = (indexToRemove) => {
+    setTags(tags.filter((_, index) => index !== indexToRemove)); // Remove tag by index
+  };
+
+  const copyToClipboard = () => {
+    // Convert both `tags` and `relatedTag` to strings
+    const tagString = tags.join(", ");
+    const relatedTagString = relatedTag.map((tag) => tag.keyword).join(", ");
+
+    // Combine both strings into one
+    const combinedTags =
+      tagString + (relatedTagString ? ", " + relatedTagString : "");
+
+    // Copy the combined tags to the clipboard
+    navigator.clipboard
+      .writeText(combinedTags)
+      .then(() => {
+        alert("Tags copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Could not copy text: ", err);
+      });
+  };
+
+  const downloadTags = () => {
+    // Convert `tags` and `relatedTag` to a plain text format
+    const tagString = tags.join("\n");
+    const relatedTagString = relatedTag.map((tag) => tag.keyword).join("\n");
+
+    // Combine both tag strings into one
+    const combinedTags =
+      tagString + (relatedTagString ? "\n" + relatedTagString : "");
+
+    // Create a Blob and download the file
+    const element = document.createElement("a");
+    const file = new Blob([combinedTags], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = "hashtags.txt";
+    document.body.appendChild(element); // Required for Firefox
+    element.click();
+
+    // Clean up the element after click
+    document.body.removeChild(element);
+  };
+
+  console.log(result?.data);
+  const exactTag = result?.data?.exact_keyword;
+  const relatedTag = result?.data?.related_keywords;
+  console.log(exactTag, relatedTag);
+
+  const generatetags = async () => {
+    try {
+      const res = await axios.get(
+        `https://keyword-research-for-youtube.p.rapidapi.com/yttags.php?keyword=${tags}`,
+        {
+          headers: {
+            "X-RapidAPI-Key":
+              "450fb1badcmsh09b0e8dd6502861p189847jsne572f5a074ed",
+            "X-RapidAPI-Host": "keyword-research-for-youtube.p.rapidapi.com",
+          },
+        }
+      );
+      setResult(res);
+      setShowResult(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <h2 className="text-4xl mt-12 font-bold text-center text-cyan-800">
@@ -9,18 +97,47 @@ const HashtagGen = () => {
       </h2>
 
       <div className="flex items-center justify-center min-h-full">
-        <div className="flex flex-col w-10/12 items-center bg-slate-100 p-4 shadow-xl rounded-xl mt-10">
-          <input
+        <div className="flex flex-col w-10/12 items-center bg-white p-4 shadow-xl rounded-xl mt-10">
+          <div className="w-[90%] border rounded-lg p-2 flex flex-wrap items-center">
+            {/* Render tags */}
+            {tags.map((tag, index) => (
+              <div
+                key={index}
+                className="bg-gray-200 text-gray-700 rounded-full flex items-center px-3 py-1 m-1"
+              >
+                <span>{tag}</span>
+                <button
+                  onClick={() => removeTag(index)}
+                  className="ml-2 text-gray-500 hover:text-gray-800"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {/* Input for new tags */}
+            <input
+              className="flex-grow border-none focus:outline-none m-1"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)} // Update inputValue on change
+              onKeyDown={handleKeyDown} // Handle keypress events
+              placeholder="Type and press Enter"
+            />
+          </div>
+          {/* <input
             id="price"
             name="price"
             type="text"
             placeholder=""
             className="block w-10/12 rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 h-40"
-          />
+          /> */}
+
           <small className="text-gray-500 italic block self-center w-10/12">
-            Example: php, html, css
+            Example: cricket, football, rugby
           </small>
-          <button className="bg-red-600 px-4 py-2 rounded-xl text-white font-semibold mt-4 shadow-lg">
+          <button
+            className="bg-red-600 px-4 py-2 rounded-xl text-white font-semibold mt-4 shadow-lg"
+            onClick={generatetags}
+          >
             Generate
           </button>
           <div className="flex space-x-3 items-center mt-2">
@@ -29,6 +146,61 @@ const HashtagGen = () => {
             <BsTwitterX />
             <FaLinkedinIn />
           </div>
+          {showResult && (
+            <>
+              <div className="p-4 max-w-4xl mx-auto">
+                <h2 className="text-center text-xl font-semibold mb-4">
+                  Result
+                </h2>
+                <div className="flex flex-wrap">
+                  {tags.map((tag, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-200 text-gray-700 rounded-full flex items-center px-3 py-1 m-1"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        onClick={() => removeTag(index)}
+                        className="ml-2 text-gray-500 hover:text-gray-800"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {relatedTag.map((tag, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-200 text-gray-700 rounded-full flex items-center px-3 py-1 m-1"
+                    >
+                      <span>{tag.keyword}</span>
+                      <button
+                        onClick={() => removeTag(index)}
+                        className="ml-2 text-gray-500 hover:text-gray-800"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Download and Copy Buttons */}
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={downloadTags}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg mr-4 hover:bg-red-600"
+                  >
+                    ⬇ Download
+                  </button>
+                  <button
+                    onClick={copyToClipboard}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    📋 Copy
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

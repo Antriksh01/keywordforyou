@@ -10,6 +10,8 @@ export default {
         fourth: "moveHorizontal 40s ease infinite",
         fifth: "moveInCircle 20s ease infinite",
         shimmer: "shimmer 2s linear infinite",
+        "bounce-twice": "bounceCustom 0.5s ease-in-out 2",
+        "fall-down": "fallDown 1s ease-out forwards",
       },
       keyframes: {
         shimmer: {
@@ -19,6 +21,15 @@ export default {
           to: {
             backgroundPosition: "-200% 0",
           },
+        },
+        // Move these keyframes outside of the shimmer keyframe block
+        bounceCustom: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        fallDown: {
+          "0%": { transform: "translateY(-100vh)" },
+          "100%": { transform: "translateY(0)" },
         },
         moveHorizontal: {
           "0%": {
