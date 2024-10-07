@@ -27,8 +27,10 @@ const HashtagGen = () => {
 
   const copyToClipboard = () => {
     // Convert both `tags` and `relatedTag` to strings
-    const tagString = tags.join(", ");
-    const relatedTagString = relatedTag.map((tag) => tag.keyword).join(", ");
+    const tagString = tags.map((tag) => `#${tag}`).join(", ");
+    const relatedTagString = relatedTag
+      .map((tag) => `#${tag.keyword}`)
+      .join(", ");
 
     // Combine both strings into one
     const combinedTags =
@@ -47,8 +49,10 @@ const HashtagGen = () => {
 
   const downloadTags = () => {
     // Convert `tags` and `relatedTag` to a plain text format
-    const tagString = tags.join("\n");
-    const relatedTagString = relatedTag.map((tag) => tag.keyword).join("\n");
+    const tagString = tags.map((tag) => `#${tag}`).join("\n");
+    const relatedTagString = relatedTag
+      .map((tag) => `#${tag.keyword}`)
+      .join("\n");
 
     // Combine both tag strings into one
     const combinedTags =
@@ -158,7 +162,7 @@ const HashtagGen = () => {
                       key={index}
                       className="bg-gray-200 text-gray-700 rounded-full flex items-center px-3 py-1 m-1"
                     >
-                      <span>{tag}</span>
+                      <span>#{tag}</span>
                       <button
                         onClick={() => removeTag(index)}
                         className="ml-2 text-gray-500 hover:text-gray-800"
@@ -172,7 +176,7 @@ const HashtagGen = () => {
                       key={index}
                       className="bg-gray-200 text-gray-700 rounded-full flex items-center px-3 py-1 m-1"
                     >
-                      <span>{tag.keyword}</span>
+                      <span>#{tag.keyword}</span>
                       <button
                         onClick={() => removeTag(index)}
                         className="ml-2 text-gray-500 hover:text-gray-800"

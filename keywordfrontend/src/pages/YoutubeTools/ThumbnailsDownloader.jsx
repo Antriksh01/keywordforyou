@@ -1,9 +1,42 @@
-import React from "react";
+import axios from "axios";
+import React, { useState } from "react";
 import { BsTwitterX } from "react-icons/bs";
 import { FaFacebook, FaTelegram } from "react-icons/fa";
 import { IoLogoWhatsapp } from "react-icons/io";
 
 const ThumbnailsDownloader = () => {
+  const [inputValue, setInputValue] = useState("");
+  const [result, setResult] = useState();
+  const [showResult, setShowResult] = useState(false);
+
+  const tagExtract = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://youtube-video-info1.p.rapidapi.com/youtube-info/?url=${inputValue}`,
+        {
+          headers: {
+            "X-RapidAPI-Host": "youtube-video-info1.p.rapidapi.com",
+            "X-RapidAPI-Key":
+              "450fb1badcmsh09b0e8dd6502861p189847jsne572f5a074ed",
+          },
+        }
+      );
+
+      setResult(data?.info?.thumbnail);
+      console.log(data);
+
+      setShowResult(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(result);
+
+  const downloadImage = (url) => {
+    window.open(url, "_blank");
+  };
+
   return (
     <>
       <div>
@@ -16,12 +49,38 @@ const ThumbnailsDownloader = () => {
               type="text"
               placeholder="Example : https://youtu.be/eUDEdKzw0Lg"
               className="w-screen p-3 h-10 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-red-400"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
-            <button className="bg-red-600 text-white rounded p-2 h-10 font-bold">
+            <button
+              className="bg-red-600 text-white rounded p-2 h-10 font-bold"
+              onClick={tagExtract}
+            >
               Extract
             </button>
           </div>
+          {showResult && (
+            <>
+              <div className="p-4 max-w-4xl mx-auto">
+                <h2 className="text-center text-xl font-semibold mb-4">
+                  Result
+                </h2>
+                <div className="flex flex-wrap">
+                  <img src={result} alt="" className="h-96 w-auto" />
+                </div>
 
+                {/* Download and Copy Buttons */}
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => downloadImage(result)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg mr-4 hover:bg-red-600"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
           <div className="flex justify-center space-x-4 mt-2">
             <button className="text-cyan-800">Share :</button>
             <ul className="flex space-x-2 items-center text-cyan-800">

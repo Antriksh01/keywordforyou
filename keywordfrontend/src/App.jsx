@@ -28,6 +28,8 @@ import Home from "./pages/Home";
 import Footer from "./component/Footer";
 import EmbedCodeGen from "./pages/YoutubeTools/EmbedCodeGen";
 import ChannelSearchTool from "./pages/YoutubeTools/ChannelSearchTool";
+import VideoDownloader from "./pages/YoutubeTools/VideoDownloader";
+import VideoSplitter from "./pages/YoutubeTools/VideoSplitter";
 
 const App = () => {
   return (
@@ -84,6 +86,8 @@ const App = () => {
         <Route path="/contact-us" element={<Contactus />} />
         <Route path="/advertise-with-us" element={<AdvertiseWithUs />} />
         <Route path="/write-for-us" element={<WriteForUs />} />
+        <Route path="/video-downloader" element={<VideoDownloader />} />
+        <Route path="/video-splitter" element={<VideoSplitter />} />
       </Routes>
       <Footer />
     </>

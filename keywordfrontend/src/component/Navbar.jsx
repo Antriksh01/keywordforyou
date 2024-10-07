@@ -14,6 +14,7 @@ import {
   FaTags,
   FaBriefcase,
   FaComment,
+  FaPhotoVideo,
 } from "react-icons/fa";
 import { useState } from "react";
 import {
@@ -378,6 +379,48 @@ export default function Navbar() {
                         </li>
                       </Link>
                     </MenuItem>
+                  </ul>
+                </div>
+                <div className="flex-shrink-0 rounded-md shadow-2xl p-5">
+                  <h2 className="text-xl font-bold mb-1">Downloader Tool</h2>
+                  <ul>
+                    <MenuItem>
+                      <Link
+                        to="/video-downloader"
+                        className="block text-sm text-gray-700 "
+                      >
+                        <li className="flex items-center">
+                          <FaPhotoVideo className="text-lg font-bold mr-1" />
+                          <h5 className="hover:text-red-400">
+                            Video Downloader
+                          </h5>
+                        </li>
+                      </Link>
+                    </MenuItem>
+                    <MenuItem>
+                      <Link
+                        to="/video-splitter"
+                        className="block text-sm text-gray-700 "
+                      >
+                        <li className="flex items-center">
+                          <FaPhotoVideo className="text-lg font-bold mr-1" />
+                          <h5 className="hover:text-red-400">Video Splitter</h5>
+                        </li>
+                      </Link>
+                    </MenuItem>
+                    {/* <MenuItem>
+                      <Link
+                        to="/youtube-comment-picker"
+                        className="block text-sm text-gray-700 data-[focus]:bg-gray-100"
+                      >
+                        <li className="flex items-center">
+                          <FaComment className="text-lg font-bold mr-1" />
+                          <h5 className="hover:text-red-400">
+                            YouTube Comment Picker
+                          </h5>
+                        </li>
+                      </Link>
+                    </MenuItem> */}
                   </ul>
                 </div>
               </div>

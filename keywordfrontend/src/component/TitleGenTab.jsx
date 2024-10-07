@@ -1,3 +1,4 @@
+import axios from "axios";
 import cogoToast from "cogo-toast";
 import React, { useState } from "react";
 import { BsTwitterX } from "react-icons/bs";
@@ -6,70 +7,42 @@ import { IoLogoWhatsapp } from "react-icons/io";
 import { IoCopySharp } from "react-icons/io5";
 
 const TitleGenTab = () => {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [selectedResults, setSelectedResults] = useState({});
+  const [inputValue, setInputValue] = useState("");
+  const [result, setResult] = useState();
+  const [showResult, setShowResult] = useState(false);
 
-  const travelResults = [
-    "10 Out Of This World Traveling Things",
-    "4 Experts Share Their Astonishing Thoughts On Traveling",
-    "Powerful Guidelines For Traveling",
-    "Secrets To Traveling Revealed: Here's What You Need To Know",
-    "How To Travel [Fast And Easy]",
-    "Top 15 Tools For Traveling",
-    "Thousands Already Travel And So You Can",
-    "16 Simple Tricks You Can Follow To Travel",
-    "Why You Need To Travel",
-    "28 Tips That Show Anybody How To Travel - Guaranteed",
-  ];
+  const handleGenerate = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://youtube-video-info1.p.rapidapi.com/youtube-info/?url=${inputValue}`,
+        {
+          headers: {
+            "X-RapidAPI-Host": "youtube-video-info1.p.rapidapi.com",
+            "X-RapidAPI-Key":
+              "450fb1badcmsh09b0e8dd6502861p189847jsne572f5a074ed",
+          },
+        }
+      );
 
-  const handleGenerate = () => {
-    // Simulating result generation based on user input
-    if (query) {
-      setResults(travelResults);
+      setResult(data?.info?.fulltitle);
+      console.log(data);
+
+      setShowResult(true);
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  const handleCheckboxChange = (index) => {
-    setSelectedResults((prevSelected) => ({
-      ...prevSelected,
-      [index]: !prevSelected[index],
-    }));
-  };
-
-  const handleDownload = () => {
-    const selectedItems = results.filter((_, index) => selectedResults[index]);
-
-    if (selectedItems.length > 0) {
-      const blob = new Blob([selectedItems.join("\n")], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "selected-travel-results.txt";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } else {
-      alert("Please select at least one item to download.");
-    }
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(results.join("\n"));
-    alert("Copied to clipboard!");
-  };
-
-  const handleSelectAll = () => {
-    // Check if all results are already selected
-    const allSelected = results.every((_, index) => selectedResults[index]);
-
-    // If all are selected, unselect all; otherwise, select all
-    const newSelectedResults = results.reduce((acc, _, index) => {
-      acc[index] = !allSelected; // Toggle based on allSelected state
-      return acc;
-    }, {});
-
-    setSelectedResults(newSelectedResults);
+  const copyToClipboard = () => {
+    const tagString = result;
+    navigator.clipboard
+      .writeText(tagString)
+      .then(() => {
+        alert("Tags copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Could not copy text: ", err);
+      });
   };
 
   return (
@@ -81,9 +54,9 @@ const TitleGenTab = () => {
         <div className="w-auto flex space-x-2 max-w-auto">
           <input
             type="text"
-            placeholder="Example: travel"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Example: https://www.youtube.com/watch?v=WQdqgrWvy6g"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             className="w-screen p-3 h-10 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-red-400"
           />
           <button
@@ -93,55 +66,32 @@ const TitleGenTab = () => {
             Generate
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          {results.map((result, index) => (
-            <div
-              key={index}
-              className="flex items-center space-x-2 rounded-3xl bg-gray-200 px-3 py-1 shadow"
-            >
-              <input
-                type="checkbox"
-                checked={!!selectedResults[index]}
-                onChange={() => handleCheckboxChange(index)}
-                className="h-4 w-4"
-              />
-              <span>{result}</span>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(result);
-                  cogoToast.success(`Copied`);
-                }}
-                className=" text-gray-500 px-2 py-1 rounded-md"
-              >
-                <IoCopySharp />
-              </button>
-            </div>
-          ))}
+        <div className="">
+          {showResult && (
+            <>
+              <div className="p-4 max-w-4xl mx-auto">
+                <h2 className="text-center text-xl font-semibold mb-4">
+                  Result
+                </h2>
+                <div className="">
+                  <h2 className="text-center text-gray-500 text-lg">
+                    <span className="font-bold">Title</span> : {result}
+                  </h2>
+                </div>
+
+                {/* Download and Copy Buttons */}
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={copyToClipboard}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    📋 Copy
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-        {results.length > 0 && (
-          <>
-            <div className="flex justify-center space-x-4 mb-4 mt-4">
-              <button
-                onClick={handleDownload}
-                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700"
-              >
-                Download
-              </button>
-              <button
-                onClick={handleCopy}
-                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700"
-              >
-                Copy All
-              </button>
-              <button
-                onClick={handleSelectAll}
-                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700"
-              >
-                Select All
-              </button>
-            </div>
-          </>
-        )}
 
         <div className="flex justify-center space-x-4 mt-2">
           <button className="text-cyan-800">Share :</button>

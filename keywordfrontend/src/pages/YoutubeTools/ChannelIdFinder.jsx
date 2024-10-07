@@ -1,9 +1,53 @@
-import React from "react";
+import axios from "axios";
+import React, { useState } from "react";
 import { BsTwitterX } from "react-icons/bs";
 import { FaFacebook, FaTelegram } from "react-icons/fa";
 import { IoLogoWhatsapp } from "react-icons/io";
 
 const ChannelIdFinder = () => {
+  const [inputValue, setInputValue] = useState("");
+  const [result, setResult] = useState();
+  const [showResult, setShowResult] = useState(false);
+
+  const channelIdFind = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://youtube-video-info1.p.rapidapi.com/youtube-info/?url=${inputValue}`,
+        {
+          headers: {
+            "X-RapidAPI-Host": "youtube-video-info1.p.rapidapi.com",
+            "X-RapidAPI-Key":
+              "450fb1badcmsh09b0e8dd6502861p189847jsne572f5a074ed",
+          },
+        }
+      );
+
+      setResult(data?.info?.channel_id);
+      console.log(data);
+
+      setShowResult(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(result);
+
+  const copyToClipboard = () => {
+    // Convert both `tags` and `relatedTag` to strings
+    const tagString = result;
+
+    // Copy the combined tags to the clipboard
+    navigator.clipboard
+      .writeText(tagString)
+      .then(() => {
+        alert("Tags copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Could not copy text: ", err);
+      });
+  };
+
   return (
     <>
       <div>
@@ -14,14 +58,42 @@ const ChannelIdFinder = () => {
           <div className="w-auto flex space-x-2 max-w-auto">
             <input
               type="text"
-              placeholder="Example : https://www.youtube.com/@Tseries"
+              placeholder="Example : https://www.youtube.com/watch?v=OzsYsAvVaTk"
               className="w-screen p-3 h-10 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-red-400"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
-            <button className="bg-red-600 text-white rounded p-2 h-10">
+            <button
+              className="bg-red-600 text-white rounded p-2 h-10"
+              onClick={channelIdFind}
+            >
               Generate
             </button>
           </div>
+          {showResult && (
+            <>
+              <div className="p-4 max-w-4xl mx-auto">
+                <h2 className="text-center text-xl font-semibold mb-4">
+                  Result
+                </h2>
+                <div className="">
+                  <h2 className="text-center text-gray-500 text-lg">
+                    <span className="font-bold">Channel ID</span> : {result}
+                  </h2>
+                </div>
 
+                {/* Download and Copy Buttons */}
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={copyToClipboard}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    📋 Copy
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
           <div className="flex justify-center space-x-4 mt-2">
             <button className="text-cyan-800">Share :</button>
             <ul className="flex space-x-2 items-center text-cyan-800">

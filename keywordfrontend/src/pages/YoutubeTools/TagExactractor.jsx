@@ -1,9 +1,73 @@
-import React from "react";
+import axios from "axios";
+import React, { useState } from "react";
 import { BsTwitterX } from "react-icons/bs";
 import { FaFacebook, FaTelegram } from "react-icons/fa";
 import { IoLogoWhatsapp } from "react-icons/io";
 
 const TagExactractor = () => {
+  const [inputValue, setInputValue] = useState("");
+  const [tags, setTags] = useState([]);
+  const [result, setResult] = useState();
+  const [showResult, setShowResult] = useState(false);
+
+  const tagExtract = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://youtube-video-info1.p.rapidapi.com/youtube-info/?url=${inputValue}`,
+        {
+          headers: {
+            "X-RapidAPI-Host": "youtube-video-info1.p.rapidapi.com",
+            "X-RapidAPI-Key":
+              "450fb1badcmsh09b0e8dd6502861p189847jsne572f5a074ed",
+          },
+        }
+      );
+
+      setResult(data?.info?.tags);
+      console.log(data);
+
+      setShowResult(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(result);
+
+  const removeTag = (indexToRemove) => {
+    setResult(result?.filter((_, index) => index !== indexToRemove)); // Remove tag by index
+  };
+
+  const copyToClipboard = () => {
+    // Convert both `tags` and `relatedTag` to strings
+    const tagString = result.join(", ");
+
+    // Copy the combined tags to the clipboard
+    navigator.clipboard
+      .writeText(tagString)
+      .then(() => {
+        alert("Tags copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Could not copy text: ", err);
+      });
+  };
+
+  const downloadTags = () => {
+    const tagString = result.join("\n");
+
+    // Create a Blob and download the file
+    const element = document.createElement("a");
+    const file = new Blob([tagString], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = "tag_extractor.txt";
+    document.body.appendChild(element); // Required for Firefox
+    element.click();
+
+    // Clean up the element after click
+    document.body.removeChild(element);
+  };
+
   return (
     <>
       <div>
@@ -16,12 +80,57 @@ const TagExactractor = () => {
               type="text"
               placeholder="Example : https://youtu.be/eUDEdKzw0Lg"
               className="w-screen p-3 h-10 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-red-400"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
-            <button className="bg-red-600 text-white rounded p-2 h-10">
+            <button
+              className="bg-red-600 text-white rounded p-2 h-10"
+              onClick={tagExtract}
+            >
               Extract
             </button>
           </div>
+          {showResult && (
+            <>
+              <div className="p-4 max-w-4xl mx-auto">
+                <h2 className="text-center text-xl font-semibold mb-4">
+                  Result
+                </h2>
+                <div className="flex flex-wrap">
+                  {result?.map((tag, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-200 text-gray-700 rounded-full flex items-center px-3 py-1 m-1"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        onClick={() => removeTag(index)}
+                        className="ml-2 text-gray-500 hover:text-gray-800"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
 
+                {/* Download and Copy Buttons */}
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={downloadTags}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg mr-4 hover:bg-red-600"
+                  >
+                    ⬇ Download
+                  </button>
+                  <button
+                    onClick={copyToClipboard}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    📋 Copy
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
           <div className="flex justify-center space-x-4 mt-2">
             <button className="text-cyan-800">Share :</button>
             <ul className="flex space-x-2 items-center text-cyan-800">

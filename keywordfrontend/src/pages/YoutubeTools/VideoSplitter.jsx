@@ -4,58 +4,71 @@ import { BsTwitterX } from "react-icons/bs";
 import { FaFacebook, FaTelegram } from "react-icons/fa";
 import { IoLogoWhatsapp } from "react-icons/io";
 
-const TitleDescriptionExtract = () => {
+const VideoSplitter = () => {
   const [inputValue, setInputValue] = useState("");
   const [result, setResult] = useState();
   const [showResult, setShowResult] = useState(false);
-  const [description, setDescription] = useState();
+  const [selectedQuality, setSelectedQuality] = useState("");
 
   const handleGenerate = async () => {
     try {
-      const { data } = await axios.get(
-        `https://youtube-video-info1.p.rapidapi.com/youtube-info/?url=${inputValue}`,
+      const { data } = await axios.post(
+        `https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`,
+        { url: inputValue },
         {
           headers: {
-            "X-RapidAPI-Host": "youtube-video-info1.p.rapidapi.com",
-            "X-RapidAPI-Key":
+            "x-rapidapi-key":
               "450fb1badcmsh09b0e8dd6502861p189847jsne572f5a074ed",
+            "x-rapidapi-host": "social-download-all-in-one.p.rapidapi.com",
+            "Content-Type": "application/json",
           },
         }
       );
 
-      setResult(data?.info?.fulltitle);
-      setDescription(data?.info?.description);
+      setResult(data);
       console.log(data);
-
       setShowResult(true);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const copyToClipboard = () => {
-    const tagString = `Title:${result} \n Description: ${description}`;
-    navigator.clipboard
-      .writeText(tagString)
-      .then(() => {
-        alert("Tags copied to clipboard!");
-      })
-      .catch((err) => {
-        console.error("Could not copy text: ", err);
-      });
+  const handleDownload = () => {
+    if (!selectedQuality) {
+      alert("Please select a video quality to download.");
+      return;
+    }
+
+    const media = result.medias.find(
+      (item) => item.quality === selectedQuality
+    );
+
+    if (media) {
+      const link = document.createElement("a");
+      link.href = media.url;
+      link.setAttribute(
+        "download",
+        `video_${selectedQuality}.${media.extension}`
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert("Selected quality not available.");
+    }
   };
 
   return (
     <>
       <div>
         <h2 className="text-4xl mt-12 mb-3 font-bold text-center text-cyan-800">
-          YouTube Title and Description Extractor
+          Video Splitter
         </h2>
         <div className="bg-gray-50 p-8 rounded-lg mb-6 shadow-xl shadow-red-300/50 max-w-4xl mx-auto">
           <div className="w-auto flex space-x-2 max-w-auto">
             <input
               type="text"
-              placeholder="Example : https://youtu.be/eUDEdKzw0Lg"
+              placeholder="Example : https://www.youtube.com/watch?v=9GBydDR4D2k"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               className="w-screen p-3 h-10 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-red-400"
@@ -64,34 +77,45 @@ const TitleDescriptionExtract = () => {
               className="bg-red-600 text-white rounded p-2 h-10"
               onClick={handleGenerate}
             >
-              Extract
+              Generate
             </button>
           </div>
           {showResult && (
             <>
-              <div className="p-4 max-w-4xl mx-auto">
-                <h2 className="text-center text-xl font-semibold mb-4">
-                  Result
-                </h2>
-                <div className="">
-                  <h2 className="text-center text-gray-500 text-lg">
-                    <span className="font-bold">Title</span> : {result}
-                  </h2>
-                  <h2 className="text-center text-gray-500 text-lg">
-                    <span className="font-bold">Description</span> :{" "}
-                    {description}
-                  </h2>
-                </div>
+              <div className="flex flex-col items-center justify-center p-4">
+                <img
+                  src={result.thumbnail}
+                  alt={result.title}
+                  className="mb-4 w-1/2"
+                />
+                <h2 className="text-lg font-bold mb-2">{result.title}</h2>
+                <p className="text-gray-600 mb-4">Author: {result.author}</p>
 
-                {/* Download and Copy Buttons */}
-                <div className="mt-4 text-center">
-                  <button
-                    onClick={copyToClipboard}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                  >
-                    📋 Copy
-                  </button>
-                </div>
+                <label htmlFor="quality" className="mb-2 font-medium">
+                  Select Video Quality:
+                </label>
+                <select
+                  id="quality"
+                  value={selectedQuality}
+                  onChange={(e) => setSelectedQuality(e.target.value)}
+                  className="mb-4 p-2 border rounded"
+                >
+                  <option value="">--Select Quality--</option>
+                  {result.medias
+                    .filter((media) => media.type === "video")
+                    .map((media, index) => (
+                      <option key={index} value={media.quality}>
+                        {media.quality}
+                      </option>
+                    ))}
+                </select>
+
+                <button
+                  onClick={handleDownload}
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded shadow-lg"
+                >
+                  Download Video
+                </button>
               </div>
             </>
           )}
@@ -448,4 +472,4 @@ const TitleDescriptionExtract = () => {
   );
 };
 
-export default TitleDescriptionExtract;
+export default VideoSplitter;
