@@ -144,7 +144,7 @@ export default function Navbar() {
                         <li className="flex items-center">
                           <TbFileDescription className="text-xl font-bold mr-1 hover:text-red-400" />
                           <h5 className="hover:text-red-400">
-                            YouTube Title & Description Generator
+                            YouTube Meta Data Generator
                           </h5>
                         </li>
                       </Link>

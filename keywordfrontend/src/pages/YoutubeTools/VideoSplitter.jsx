@@ -12,15 +12,13 @@ const VideoSplitter = () => {
 
   const handleGenerate = async () => {
     try {
-      const { data } = await axios.post(
-        `https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`,
-        { url: inputValue },
+      const { data } = await axios.get(
+        `https://yt-api-video-download.p.rapidapi.com/download_links?video_url=${inputValue}`,
         {
           headers: {
             "x-rapidapi-key":
               "450fb1badcmsh09b0e8dd6502861p189847jsne572f5a074ed",
-            "x-rapidapi-host": "social-download-all-in-one.p.rapidapi.com",
-            "Content-Type": "application/json",
+            "x-rapidapi-host": "yt-api-video-download.p.rapidapi.com",
           },
         }
       );
@@ -39,13 +37,13 @@ const VideoSplitter = () => {
       return;
     }
 
-    const media = result.medias.find(
-      (item) => item.quality === selectedQuality
+    const media = result.links.find(
+      (item) => item.qualityLabel === selectedQuality
     );
 
     if (media) {
       const link = document.createElement("a");
-      link.href = media.url;
+      link.href = media.link;
       link.setAttribute(
         "download",
         `video_${selectedQuality}.${media.extension}`
@@ -57,6 +55,8 @@ const VideoSplitter = () => {
       alert("Selected quality not available.");
     }
   };
+
+  console.log(result?.links);
 
   return (
     <>
@@ -84,12 +84,16 @@ const VideoSplitter = () => {
             <>
               <div className="flex flex-col items-center justify-center p-4">
                 <img
-                  src={result.thumbnail}
-                  alt={result.title}
+                  src={result?.picture}
+                  alt={result?.description}
                   className="mb-4 w-1/2"
                 />
-                <h2 className="text-lg font-bold mb-2">{result.title}</h2>
-                <p className="text-gray-600 mb-4">Author: {result.author}</p>
+                <h2 className="text-lg font-bold mb-2">
+                  {result?.description}
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Author: {result?.author?.name}
+                </p>
 
                 <label htmlFor="quality" className="mb-2 font-medium">
                   Select Video Quality:
@@ -101,13 +105,24 @@ const VideoSplitter = () => {
                   className="mb-4 p-2 border rounded"
                 >
                   <option value="">--Select Quality--</option>
-                  {result.medias
-                    .filter((media) => media.type === "video")
+                  {result?.links
+                    ?.filter((audio) => audio.hasAudio === true)
                     .map((media, index) => (
-                      <option key={index} value={media.quality}>
-                        {media.quality}
-                      </option>
+                      <>
+                        <option key={index} value={media?.qualityLabel}>
+                          {media?.qualityLabel}
+                        </option>
+                      </>
                     ))}
+                  {/* {[
+                    ...new Set(
+                      result?.links?.map((media) => media.qualityLabel)
+                    ),
+                  ].map((qualityLabel, index) => (
+                    <option key={index} value={qualityLabel}>
+                      {qualityLabel}
+                    </option>
+                  ))} */}
                 </select>
 
                 <button

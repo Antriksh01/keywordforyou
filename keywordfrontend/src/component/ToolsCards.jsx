@@ -29,7 +29,7 @@ export const projects = [
   },
   {
     icon: <TbFileDescription />,
-    title: "Title & Description Generator",
+    title: "Meta Data Generator",
     description:
       "A multinational technology company that specializes in Internet-related services and products.",
     link: "https://google.com",

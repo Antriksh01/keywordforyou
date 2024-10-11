@@ -36,7 +36,7 @@ const VideoDownloader = () => {
 
   const handleDownload = () => {
     if (!selectedQuality) {
-      alert("Please select a video quality to download.");
+      alert("Please select a video quality.");
       return;
     }
 
@@ -45,15 +45,8 @@ const VideoDownloader = () => {
     );
 
     if (media) {
-      const link = document.createElement("a");
-      link.href = media.url;
-      link.setAttribute(
-        "download",
-        `video_${selectedQuality}.${media.extension}`
-      );
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Open the media URL in a new tab
+      window.open(media.url, "_blank");
     } else {
       alert("Selected quality not available.");
     }
