@@ -40,7 +40,7 @@ const App = () => {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/signup/:value" element={<Signup />} />
         <Route
           path="/youtube-title-description-generator"
           element={<TitleDescriptionGen />}

@@ -13,9 +13,8 @@ const Footer = () => {
         <footer className="flex justify-between gap-10 w-10/12">
           <aside>
             <img
-              src="https://keywords4u.com/assets/images/new-logo.png"
+              src="https://res.cloudinary.com/antrix/image/upload/v1728712971/keywordsforyou/keywordforulogo_koel1o.png"
               alt=""
-              srcset=""
               className="h-12"
             />
             {/* <svg

@@ -93,7 +93,7 @@ export default function Navbar() {
             <div className="flex flex-shrink-0 items-center">
               <img
                 alt="Your Company"
-                src="https://keywords4u.com/assets/images/new-logo.png"
+                src="https://res.cloudinary.com/antrix/image/upload/v1728712971/keywordsforyou/keywordforulogo_koel1o.png"
                 className="h-8 w-auto"
               />
             </div>
@@ -543,7 +543,7 @@ export default function Navbar() {
                       <button className="text-sm font-medium">Login</button>
                     </HoverBorderGradient>
                   </Link>
-                  <Link to="/signup">
+                  <Link to="/pricing">
                     <HoverBorderGradient
                       containerClassName="rounded-full"
                       as="button"
