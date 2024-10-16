@@ -6,6 +6,12 @@ const bcrypt = require("bcrypt");
 const paypal = require("@paypal/checkout-server-sdk");
 const requestIp = require("request-ip");
 const { client } = require("../paypal");
+const JWT = require("jsonwebtoken");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
+const PORT = process.env.PORT;
 
 const userRegistration = (req, res) => {
   const dateTime = moment().tz("Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss");
@@ -67,7 +73,7 @@ const userRegistration = (req, res) => {
           const hashedPassword = bcrypt.hashSync(password, saltRounds);
           // Insert the new user data into the database
           const insertQuery =
-            "INSERT INTO customers (LoginID, EmailAddress, Mobile, Password, Name, dob, Address, City, State, postcode, Country, ApprovalStatus, AddedDate, Membership, charges, Pstatus, membershipstartdate, MembershipExpiryDate) VALUE (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?)";
+            "INSERT INTO customers (LoginID, EmailAddress, Mobile, Password, Name, dob, Address, City, State, postcode, Country, ApprovalStatus, AddedDate, Membership, charges, Pstatus, membershipstartdate, MembershipExpiryDate) VALUE (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)";
           const insertParams = [
             newLoginID,
             email,
@@ -107,89 +113,74 @@ const userRegistration = (req, res) => {
   }
 };
 
-const createPaypalOrder = async (req, res) => {
+const userLogin = async (req, res) => {
   try {
-    const request = new paypal.orders.OrdersCreateRequest();
-    request.prefer("return=representation");
-    request.requestBody({
-      intent: "CAPTURE",
-      purchase_units: [
-        {
-          amount: {
-            currency_code: "USD",
-            value: "100.00", // Set your price dynamically
-          },
-        },
-      ],
-    });
-
-    const order = await client().execute(request);
-
-    res.json({
-      id: order.result.id,
-      status: order.result.status,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error creating PayPal order" });
-  }
-};
-
-const capturePaypalOrder = async (req, res) => {
-  try {
-    const { orderID } = req.body;
-    const clientIp = requestIp.getClientIp(req); // Get client IP address
-
-    const request = new paypal.orders.OrdersCaptureRequest(orderID);
-    request.requestBody({});
-
-    // Execute the capture request
-    const capture = await client().execute(request);
-
-    if (capture.result.status === "COMPLETED") {
-      // Extract required data from the capture result
-      const transactionID = capture.result.id;
-      const amount = capture.result.purchase_units[0].amount.value;
-      const currency = capture.result.purchase_units[0].amount.currency_code;
-      const paymentMethod = capture.result.payer.payment_method || "PayPal"; // Usually PayPal
-      const transactionStatus = capture.result.status;
-
-      // Insert transaction data into the MySQL database
-      try {
-        await db.query(
-          "INSERT INTO transactions (transactionID, currency, paymentMethod, amount, transactionStatus, ipAddress) VALUES (?, ?, ?, ?, ?, ?)",
-          [
-            transactionID,
-            currency,
-            paymentMethod,
-            amount,
-            transactionStatus,
-            clientIp,
-          ]
-        );
-
-        // Respond with success and transaction data
-        res.json({
-          status: capture.result.status,
-          id: capture.result.id,
-        });
-      } catch (dbError) {
-        // Handle MySQL insertion errors
-        console.error("Database Insertion Error:", dbError);
-        res.status(500).json({ error: "Database Insertion Error" });
-      }
-    } else {
-      // If the payment was not completed, return an error
-      res.status(400).json({ error: "Payment not completed" });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email or password",
+      });
     }
+
+    db.query(
+      `SELECT * FROM customers WHERE EmailAddress = ?`,
+      [email],
+      (err, result) => {
+        if (err) {
+          // logger.registrationLogger.log("error", "Internal server error");
+          return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+          });
+        }
+        if (result.length === 0) {
+          // logger.registrationLogger.log("error", "Email is not registered please contact team for further assistance");
+          return res.status(404).json({
+            success: false,
+            message: "Email is not registered. Please sign up first.",
+          });
+        }
+
+        const user = result[0];
+
+        const match = bcrypt.compareSync(password, user.Password);
+        if (!match) {
+          // logger.registrationLogger.log("error", "Invalid password");
+          return res.status(401).json({
+            success: false,
+            message: "Invalid password",
+          });
+        }
+
+        // Optionally check employee status if needed
+        // if (user.employee_status !== "Approved") {
+        //   return res.status(403).json({
+        //     success: false,
+        //     message: "Your email is not approved. Please contact the team for further assistance.",
+        //   });
+        // }
+
+        const token = JWT.sign({ id: user.LoginID }, process.env.JWT_SECRET, {
+          expiresIn: "12h",
+        });
+
+        // logger.registrationLogger.log("info", "Login successful");
+        return res.status(200).json({
+          success: true,
+          message: "Login successful",
+          user: { ...user, token: token },
+        });
+      }
+    );
   } catch (error) {
-    // Handle any errors during the PayPal capture request
-    console.error("Error capturing PayPal order:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error capturing PayPal order" });
+    // logger.registrationLogger.log("error", "Internal server error");
+    return res.status(500).json({
+      success: false,
+      message: "Login failed",
+      error: error.message,
+    });
   }
 };
 
-module.exports = { userRegistration, createPaypalOrder, capturePaypalOrder };
+module.exports = { userRegistration, userLogin };

@@ -30,8 +30,14 @@ import EmbedCodeGen from "./pages/YoutubeTools/EmbedCodeGen";
 import ChannelSearchTool from "./pages/YoutubeTools/ChannelSearchTool";
 import VideoDownloader from "./pages/YoutubeTools/VideoDownloader";
 import VideoSplitter from "./pages/YoutubeTools/VideoSplitter";
+import { useDispatch, useSelector } from "react-redux";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state?.user?.currentUser);
+  console.log(user);
+
   return (
     <>
       <Navbar />
@@ -88,6 +94,7 @@ const App = () => {
         <Route path="/write-for-us" element={<WriteForUs />} />
         <Route path="/video-downloader" element={<VideoDownloader />} />
         <Route path="/video-splitter" element={<VideoSplitter />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
       <Footer />
     </>

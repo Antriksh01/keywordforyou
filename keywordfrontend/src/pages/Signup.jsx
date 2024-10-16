@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import axios from "axios";
+import cogoToast from "cogo-toast";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Signup = () => {
   const params = useParams();
+  const navigate = useNavigate();
   console.log(params.value);
   const [formData, setFormData] = useState({
     fullname: "",
@@ -17,6 +20,7 @@ const Signup = () => {
     postcode: "",
     plan: params.value,
     charges: params.value === "monthly" ? 300 : 730,
+    paymentStatus: "pending",
   });
 
   const handleChange = (e) => {
@@ -42,6 +46,21 @@ const Signup = () => {
 
   console.log(formData);
 
+  const registerUser = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        "http://localhost:8282/api/v1/user/user-registration",
+        formData
+      );
+      cogoToast.success("user registered successfully");
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+      cogoToast.error("user registeration failed!");
+    }
+  };
+
   return (
     <>
       <div className="flex space-x-2 my-6 mb-12 mx-12">
@@ -58,7 +77,7 @@ const Signup = () => {
           <div className="flex items-center justify-center h-auto mt-10 bg-white">
             <div className="bg-white p-8 rounded-lg shadow-xl shadow-red-300 w-full max-w-lg">
               <h2 className="text-2xl font-semibold mb-6">Sign Up</h2>
-              <form>
+              <form onSubmit={registerUser}>
                 <div className="flex space-x-2">
                   <div className="mb-4">
                     <label className="block text-gray-700">Name</label>
@@ -157,9 +176,9 @@ const Signup = () => {
                     <label className="block text-gray-700">Post Code</label>
                     <input
                       type="text"
-                      placeholder="City"
-                      name="city"
-                      value={formData.city}
+                      placeholder="Postal Code"
+                      name="postcode"
+                      value={formData.postcode}
                       onChange={handleChange}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
@@ -218,6 +237,7 @@ const Signup = () => {
           </div>
         </div>
       </div>
+      <div id="paypal-button-container"></div>
     </>
   );
 };
