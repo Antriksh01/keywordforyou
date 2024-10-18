@@ -23,7 +23,7 @@ import {
   TbSettingsSearch,
 } from "react-icons/tb";
 import { ImEmbed2 } from "react-icons/im";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { GrChannel } from "react-icons/gr";
 import { GiExtractionOrb, GiKnightBanner } from "react-icons/gi";
 import { AiOutlineAudit } from "react-icons/ai";
@@ -34,6 +34,7 @@ import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { BackgroundLines } from "../Extras/background-lines";
 import { HoverBorderGradient } from "../Extras/hover-border-gradient";
 import { useDispatch, useSelector } from "react-redux";
+import { clearUser } from "../redux/user/userSlice";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -69,15 +70,16 @@ function classNames(...classes) {
 
 export default function Navbar() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state) => state?.user?.currentUser);
   console.log(user);
   const location = useLocation();
   const [active, setActive] = useState(null);
   const [loggedUser, setLoggedUser] = useState(false);
-  console.log(user.token);
+  console.log(user?.token);
 
   const checkUser = () => {
-    if (user.token) {
+    if (user?.token) {
       setLoggedUser(true);
     } else {
       setLoggedUser(false);
@@ -86,7 +88,16 @@ export default function Navbar() {
 
   useEffect(() => {
     checkUser();
-  }, []);
+  }, [user?.token]);
+
+  const handleLogout = () => {
+    const isConfirmed = window.confirm("Are you sure you want to Logout?");
+    if (!isConfirmed) {
+      return;
+    }
+    navigate("/");
+    dispatch(clearUser());
+  };
 
   return (
     <Disclosure as="nav" className="bg-red">
@@ -521,28 +532,28 @@ export default function Navbar() {
                     className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                   >
                     <MenuItem>
-                      <a
-                        href="#"
+                      <Link
+                        to="/user-profile"
                         className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                       >
                         Your Profile
-                      </a>
+                      </Link>
                     </MenuItem>
-                    <MenuItem>
+                    {/* <MenuItem>
                       <a
                         href="#"
                         className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                       >
                         Settings
                       </a>
-                    </MenuItem>
+                    </MenuItem> */}
                     <MenuItem>
-                      <a
-                        href="#"
+                      <button
+                        onClick={handleLogout}
                         className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                       >
                         Sign out
-                      </a>
+                      </button>
                     </MenuItem>
                   </MenuItems>
                 </Menu>

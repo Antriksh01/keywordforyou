@@ -32,6 +32,7 @@ import VideoDownloader from "./pages/YoutubeTools/VideoDownloader";
 import VideoSplitter from "./pages/YoutubeTools/VideoSplitter";
 import { useDispatch, useSelector } from "react-redux";
 import ResetPassword from "./pages/ResetPassword";
+import UserProfile from "./pages/UserProfile";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -95,6 +96,7 @@ const App = () => {
         <Route path="/video-downloader" element={<VideoDownloader />} />
         <Route path="/video-splitter" element={<VideoSplitter />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/user-profile" element={<UserProfile />} />
       </Routes>
       <Footer />
     </>

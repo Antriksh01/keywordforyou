@@ -7,6 +7,9 @@ const Signup = () => {
   const params = useParams();
   const navigate = useNavigate();
   console.log(params.value);
+  const [allCountries, setAllCountries] = useState([]);
+  const [allStates, setAllStates] = useState([]);
+  const [allCities, setAllCities] = useState([]);
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -60,6 +63,92 @@ const Signup = () => {
       cogoToast.error("user registeration failed!");
     }
   };
+
+  const getAllCountries = async () => {
+    try {
+      const res = await axios.get(
+        "https://api.countrystatecity.in/v1/countries",
+        {
+          headers: {
+            "X-CSCAPI-KEY":
+              "NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA==",
+          },
+        }
+      );
+
+      setAllCountries(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const countryFilter = allCountries?.filter((country) => {
+    if (formData.country) {
+      return country.name === formData.country;
+    } else {
+      return true;
+    }
+  });
+
+  console.log(countryFilter[0]?.iso2);
+
+  useEffect(() => {
+    getAllCountries();
+  }, []);
+
+  const getAllStates = async () => {
+    try {
+      const res = await axios.get(
+        `https://api.countrystatecity.in/v1/countries/${countryFilter[0]?.iso2}/states`,
+        {
+          headers: {
+            "X-CSCAPI-KEY":
+              "NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA==",
+          },
+        }
+      );
+
+      setAllStates(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const filterCities = allStates?.filter((state) => {
+    if (formData.state) {
+      return state.name === formData.state;
+    } else {
+      return true;
+    }
+  });
+
+  console.log(filterCities);
+
+  const getAllCities = async () => {
+    try {
+      const res = await axios.get(
+        `https://api.countrystatecity.in/v1/countries/${countryFilter[0]?.iso2}/states/${filterCities[0]?.iso2}/cities`,
+        {
+          headers: {
+            "X-CSCAPI-KEY":
+              "NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA==",
+          },
+        }
+      );
+
+      setAllCities(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getAllStates();
+  }, [countryFilter]);
+
+  useEffect(() => {
+    getAllCities();
+  }, [filterCities]);
 
   return (
     <>
@@ -115,46 +204,65 @@ const Signup = () => {
                       value={formData.mobile}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                      className="w-auto px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                   <div className="mb-4">
                     <label className="block text-gray-700">Country</label>
-                    <input
-                      type="text"
-                      placeholder="Country"
+                    <select
                       name="country"
                       value={formData.country}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-                    />
+                      className="w-52 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                    >
+                      <option value="">--Select a country--</option>
+                      {allCountries.map((country) => (
+                        <option key={country.name} value={country.name}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="flex space-x-2">
                   <div className="mb-4">
                     <label className="block text-gray-700">State</label>
-                    <input
-                      type="text"
-                      placeholder="State"
+
+                    <select
+                      id="state"
                       name="state"
                       value={formData.state}
                       onChange={handleChange}
+                      className="w-52 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-                    />
+                    >
+                      <option value="">Select your state</option>
+                      {allStates.map((state) => (
+                        <option key={state.name} value={state.name}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="mb-4">
                     <label className="block text-gray-700">City</label>
-                    <input
-                      type="text"
-                      placeholder="City"
+
+                    <select
+                      id="city"
                       name="city"
                       value={formData.city}
                       onChange={handleChange}
+                      className="w-52 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-                    />
+                    >
+                      <option value="">Select your city</option>
+                      {allCities.map((state) => (
+                        <option key={state.name} value={state.name}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 {/* <div className="flex space-x-2">

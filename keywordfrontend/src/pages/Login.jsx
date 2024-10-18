@@ -37,7 +37,7 @@ const Login = () => {
         cogoToast.success(response.data.message);
         dispatch(setUser(response.data.user));
         setLoading(false);
-        // navigate("/doctor-dashboard");
+        navigate("/user-profile");
         // setPopupVisible(true);
       } else {
         setLoading(false);
