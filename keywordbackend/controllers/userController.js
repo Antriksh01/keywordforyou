@@ -183,4 +183,190 @@ const userLogin = async (req, res) => {
   }
 };
 
-module.exports = { userRegistration, userLogin };
+const getUserDetails = (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const selectQuery = "SELECT * FROM customers WHERE LoginID = ?";
+    db.query(selectQuery, userId, (err, result) => {
+      if (err) {
+        res.status(400).json({ success: false, message: err.message });
+      }
+      res.status(200).send(result);
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const editUserDetails = (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const {
+      fullName,
+      email,
+      youtubeName,
+      youtubeLink,
+      facebookLink,
+      instagramLink,
+      twitterLink,
+    } = req.body;
+
+    const getQuery = `SELECT * FROM customers WHERE LoginID = ?`;
+    db.query(getQuery, userId, (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          message: "Internal server error",
+        });
+      }
+
+      if (result && result.length > 0) {
+        const updateFields = [];
+        const updateValues = [];
+
+        if (fullName) {
+          updateFields.push("Name = ?");
+          updateValues.push(fullName);
+        }
+
+        if (email) {
+          updateFields.push("EmailAddress = ?");
+          updateValues.push(email);
+        }
+
+        if (youtubeName) {
+          updateFields.push("channel_name = ?");
+          updateValues.push(youtubeName);
+        }
+
+        if (youtubeLink) {
+          updateFields.push("channel_link = ?");
+          updateValues.push(youtubeLink);
+        }
+
+        if (facebookLink) {
+          updateFields.push("facebook = ?");
+          updateValues.push(facebookLink);
+        }
+        if (instagramLink) {
+          updateFields.push("instagram = ?");
+          updateValues.push(instagramLink);
+        }
+        if (twitterLink) {
+          updateFields.push("twitter = ?");
+          updateValues.push(twitterLink);
+        }
+
+        const updateQuery = `UPDATE customers SET ${updateFields.join(
+          ", "
+        )} WHERE LoginID = ?`;
+
+        db.query(updateQuery, [...updateValues, userId], (err, result) => {
+          if (err) {
+            return res.status(500).json({
+              success: false,
+              message: "Failed to update details",
+            });
+          } else {
+            return res.status(200).json({
+              success: true,
+              message: "Details updated successfully",
+            });
+          }
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+const changePassword = async (req, res) => {
+  const userId = req.params.userId;
+  const { currentPass, newPassword } = req.body;
+
+  // Check if currentPass and newPassword are provided
+  if (!currentPass || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "Both old and new passwords are required",
+    });
+  }
+
+  try {
+    const selectQuery = "SELECT * FROM customers WHERE LoginID = ?";
+
+    // Fetch user details from the database
+    db.query(selectQuery, userId, async (err, result) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ success: false, message: "Database error" });
+      }
+
+      // Check if user exists
+      if (result.length === 0) {
+        return res
+          .status(400)
+          .json({ success: false, message: "User not found" });
+      }
+
+      const user = result[0];
+
+      // Check if user.password is valid
+      if (!user.Password) {
+        return res
+          .status(500)
+          .json({ success: false, message: "User password not found" });
+      }
+
+      // Log currentPass and user.password for debugging (remove this in production)
+      console.log("Old Password:", currentPass);
+      console.log("User Password (Hashed):", user.Password);
+
+      // Check if the old password matches
+      const isMatch = await bcrypt.compare(currentPass, user.Password);
+      if (!isMatch) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Incorrect old password" });
+      }
+
+      // Generate salt and hash the new password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      const updateQuery = "UPDATE customers SET password = ? WHERE LoginID = ?";
+
+      // Update the password in the database
+      db.query(updateQuery, [hashedPassword, userId], (err, result) => {
+        if (err) {
+          return res
+            .status(500)
+            .json({ success: false, message: "Error updating password" });
+        }
+
+        // Successful password change response
+        res
+          .status(200)
+          .json({ success: true, message: "Password changed successfully" });
+      });
+    });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = {
+  userRegistration,
+  userLogin,
+  getUserDetails,
+  editUserDetails,
+  changePassword,
+};

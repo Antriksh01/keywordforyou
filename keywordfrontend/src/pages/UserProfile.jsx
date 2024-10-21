@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Modal,
@@ -8,10 +8,16 @@ import {
   ModalTrigger,
 } from "../Extras/animated-modal";
 import { GiArmorUpgrade } from "react-icons/gi";
+import axios from "axios";
+import cogoToast from "cogo-toast";
+import UpdateDetailsForm from "../component/UpdateDetailsForm";
+import PasswordChangeModal from "../component/PasswordChangeModal";
 
 const UserProfile = () => {
   const user = useSelector((state) => state?.user?.currentUser);
   console.log(user);
+  const [userData, setUserData] = useState({});
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -30,6 +36,8 @@ const UserProfile = () => {
     });
   };
 
+  console.log(formData);
+
   const date = new Date();
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -39,6 +47,17 @@ const UserProfile = () => {
 
   console.log(formattedDate);
 
+  const getUserData = async () => {
+    try {
+      const { data } = await axios.get(
+        `http://localhost:8282/api/v1/user/getUserDetails/${user.LoginID}`
+      );
+      setUserData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const billingData = [
     {
       invoiceNumber: "K4U2284838",
@@ -47,6 +66,44 @@ const UserProfile = () => {
       status: "Success",
     },
   ];
+
+  useEffect(() => {
+    getUserData();
+  }, []);
+
+  console.log(userData);
+
+  useEffect(() => {
+    setFormData({
+      fullName: userData[0]?.Name,
+      email: userData[0]?.EmailAddress,
+      youtubeName: userData[0]?.channel_name,
+      youtubeLink: userData[0]?.channel_link,
+      facebookLink: userData[0]?.facebook,
+      instagramLink: userData[0]?.instagram,
+      twitterLink: userData[0]?.twitter,
+    });
+  }, [userData]);
+
+  const updateUserData = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `http://localhost:8282/api/v1/user/editUserDetails/${user?.LoginID}`,
+        formData
+      );
+      console.log(response);
+      cogoToast.success("data updated successfuly");
+      setLoading(false);
+      getUserData();
+      setOpen(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="min-h-screen bg-gray-50 flex justify-center items-center py-6">
@@ -58,9 +115,9 @@ const UserProfile = () => {
                 Subscription
               </h2>
               <h2 className="text-xl font-bold text-cyan-800 mb-1 uppercase">
-                {user.Membership}
+                {userData[0]?.Membership}
               </h2>
-              {user.Membership === "monthly" && (
+              {userData[0]?.Membership === "monthly" && (
                 <>
                   {/* <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                     Upgrade Plan
@@ -110,9 +167,10 @@ const UserProfile = () => {
                 Plan Ends On
               </h2>
               <p className="text-lg text-cyan-800">
-                {user.MembershipExpiryDate?.split(" ")[0]}
+                {userData[0]?.MembershipExpiryDate?.split(" ")[0]}
               </p>
-              {formattedDate >= user.MembershipExpiryDate?.split(" ")[0] && (
+              {formattedDate >=
+                userData[0]?.MembershipExpiryDate?.split(" ")[0] && (
                 <>
                   {/* <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mt-2">
                     Renew
@@ -138,7 +196,7 @@ const UserProfile = () => {
                         <div className="py-10 flex flex-wrap gap-x-4 gap-y-6 items-start justify-start max-w-sm mx-auto">
                           <div className="flex  items-center justify-center">
                             <span className="text-red-700 dark:text-neutral-300 text-2xl">
-                              Renewal Fee : ₹{user.charges} only
+                              Renewal Fee : ₹{userData[0]?.charges} only
                             </span>
                           </div>
                         </div>
@@ -164,23 +222,26 @@ const UserProfile = () => {
             <div className="bg-gray-100 p-6 rounded-lg">
               <div className="mb-2">
                 <p className="text-gray-700 font-semibold">
-                  Full Name : <span className="font-normal">{user.Name}</span>
+                  Full Name :{" "}
+                  <span className="font-normal">{userData[0]?.Name}</span>
                 </p>
               </div>
               <div className="mb-2">
                 <p className="text-gray-700 font-semibold">
                   Email :{" "}
-                  <span className="font-normal">{user.EmailAddress}</span>
+                  <span className="font-normal">
+                    {userData[0]?.EmailAddress}
+                  </span>
                 </p>
               </div>
               <div className="mb-2">
                 <p className="text-gray-700 font-semibold">
                   Youtube Channel :{" "}
                   <a
-                    href={user.channel_link}
+                    href={userData[0]?.channel_link}
                     className="text-red-500 font-normal hover:underline"
                   >
-                    YTMETHOD
+                    {userData[0]?.channel_name}
                   </a>
                 </p>
               </div>
@@ -188,10 +249,10 @@ const UserProfile = () => {
                 <p className="text-gray-700 font-semibold">
                   Youtube Channel URL :{" "}
                   <a
-                    href={user.channel_link}
+                    href={userData[0]?.channel_link}
                     className="text-red-500 font-normal hover:underline"
                   >
-                    {user.channel_link}
+                    {userData[0]?.channel_link}
                   </a>
                 </p>
               </div>
@@ -199,10 +260,10 @@ const UserProfile = () => {
                 <p className="text-blue-500 hover:text-blue-700 font-semibold">
                   Facebook URL :{" "}
                   <a
-                    href={user.facebook}
+                    href={userData[0]?.facebook}
                     className="text-red-500 font-normal hover:underline"
                   >
-                    {user.facebook}
+                    {userData[0]?.facebook}
                   </a>
                 </p>
               </div>
@@ -210,10 +271,10 @@ const UserProfile = () => {
                 <p className="text-pink-500 hover:text-pink-700 font-semibold">
                   Instagram URL :{" "}
                   <a
-                    href={user.instagram}
+                    href={userData[0]?.instagram}
                     className="text-red-500 font-normal hover:underline"
                   >
-                    {user.instagram}
+                    {userData[0]?.instagram}
                   </a>
                 </p>
               </div>
@@ -221,10 +282,10 @@ const UserProfile = () => {
                 <p className="text-blue-400 hover:text-blue-600 font-semibold">
                   Twitter :{" "}
                   <a
-                    href={user.twitter}
+                    href={userData[0]?.twitter}
                     className="text-red-500 font-normal hover:underline"
                   >
-                    {user.twitter}
+                    {userData[0]?.twitter}
                   </a>
                 </p>
               </div>
@@ -262,138 +323,42 @@ const UserProfile = () => {
                         <h2 className="text-xl font-bold text-cyan-800">
                           Update Details
                         </h2>
-                        <hr />
-                        <div className="max-h-screen mx-auto bg-white rounded-lg mt-4">
-                          <form className="grid grid-cols-2 gap-2">
-                            {/* Full Name */}
-                            <div className="col-span-2">
-                              <label className="block text-gray-700 font-bold text-sm mb-1">
-                                Full Name
-                              </label>
-                              <input
-                                type="text"
-                                name="fullName"
-                                value={formData.fullName}
-                                onChange={handleChange}
-                                className="w-full px-1 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter full name"
-                              />
-                            </div>
-
-                            {/* Email */}
-                            <div className="col-span-2">
-                              <label className="block text-gray-700 font-bold text-sm mb-2">
-                                Email Id
-                              </label>
-                              <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="w-full px-1 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter email"
-                              />
-                            </div>
-
-                            {/* Youtube Channel Name */}
-                            <div className="col-span-2">
-                              <label className="block text-gray-700 text-sm font-bold mb-2">
-                                Youtube Channel Name
-                              </label>
-                              <input
-                                type="text"
-                                name="youtubeName"
-                                value={formData.youtubeName}
-                                onChange={handleChange}
-                                className="w-full px-1 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Youtube Channel Name"
-                              />
-                            </div>
-
-                            {/* Youtube Channel Link */}
-                            <div className="col-span-2">
-                              <label className="block text-gray-700 font-bold text-sm mb-2">
-                                Youtube Channel Link
-                              </label>
-                              <input
-                                type="url"
-                                name="youtubeLink"
-                                value={formData.youtubeLink}
-                                onChange={handleChange}
-                                className="w-full px-1 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Youtube Channel Link"
-                              />
-                            </div>
-
-                            {/* Facebook Profile Link */}
-                            <div className="col-span-2">
-                              <label className="block text-gray-700 font-bold text-sm mb-2">
-                                Facebook Profile Link
-                              </label>
-                              <input
-                                type="url"
-                                name="facebookLink"
-                                value={formData.facebookLink}
-                                onChange={handleChange}
-                                className="w-full px-1 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Facebook Profile Link"
-                              />
-                            </div>
-
-                            {/* Instagram Profile Link */}
-                            <div>
-                              <label className="block text-gray-700 font-bold text-sm mb-2">
-                                Instagram Profile Link
-                              </label>
-                              <input
-                                type="url"
-                                name="instagramLink"
-                                value={formData.instagramLink}
-                                onChange={handleChange}
-                                className="w-full px-1 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Instagram Profile Link"
-                              />
-                            </div>
-
-                            {/* Twitter Profile Link */}
-                            <div className="col-span-2">
-                              <label className="block text-gray-700 font-bold mb-2">
-                                Twitter Profile Link
-                              </label>
-                              <input
-                                type="url"
-                                name="twitterLink"
-                                value={formData.twitterLink}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Twitter Profile Link"
-                              />
-                            </div>
-
-                            {/* Buttons */}
-                            <div className="col-span-2 flex justify-end space-x-4 mt-4">
-                              <button
-                                type="submit"
-                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                              >
-                                Save
-                              </button>
-                              <button
-                                type="button"
-                                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                              >
-                                Close
-                              </button>
-                            </div>
-                          </form>
-                        </div>
+                        <UpdateDetailsForm
+                          userData={userData}
+                          loginId={user?.LoginID}
+                          getUserData={getUserData}
+                        />
                       </ModalContent>
                     </ModalBody>
                   </Modal>
                 </div>
-                <button className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800">
+                {/* <button className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800">
                   Change Password
-                </button>
+                </button> */}
+                <div>
+                  <Modal>
+                    <ModalTrigger className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 flex justify-center group/modal-btn">
+                      <span className="group-hover/modal-btn:translate-x-40 text-center transition duration-500">
+                        Change Password
+                      </span>
+                      <div className="-translate-x-40 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">
+                        Change Password
+                      </div>
+                    </ModalTrigger>
+                    <ModalBody>
+                      <ModalContent>
+                        <h2 className="text-xl font-bold text-cyan-800">
+                          Update Password
+                        </h2>
+                        <PasswordChangeModal
+                          userData={userData}
+                          loginId={user?.LoginID}
+                          getUserData={getUserData}
+                        />
+                      </ModalContent>
+                    </ModalBody>
+                  </Modal>
+                </div>
               </div>
             </div>
           </div>
